@@ -5,18 +5,12 @@ const http = require('http');
 const WebSocket = require('ws');
 const fs = require("fs")
 
-var CHUNK_SIZE = 1024 * 1024 * 10, // 120kb
-    buffer = Buffer.alloc(CHUNK_SIZE),
-    filePath = 'SON_TGSAR.csv';
+const filePath = 'SON_TGSAR.csv';
 
 const app = express();
 const server = http.createServer(app);
 const wsServer = new WebSocket.Server({ server });
 
-
-const getStream = require('get-stream');
-const parse = require('csv-parse');
-const readChunk = require('read-chunk');
 
 // a set to hold all of our connected clients
 const setClients = new Set();
@@ -31,38 +25,20 @@ wsServer.on('connection', (socketConnection) => {
     // When the client sends a message to the server, relay that message to all clients
     socketConnection.on('message', (message) => {
 
-        fs.open(filePath, 'r', function (err, fd) {
-            if (err) throw err;
-            function readNextChunk() {
-                fs.read(fd, buffer, 0, CHUNK_SIZE, null, function (err, nread) {
-                    if (err) throw err;
+        var readerStream = fs.createReadStream(filePath);
+        readerStream.setEncoding('utf-8');
 
-                    if (nread === 0) {
-                        console.log("CSV file read successfully...");
-                        // done reading file, do any necessary finalization steps
-
-                        fs.close(fd, function (err) {
-                            if (err) throw err;
-                        });
-                        return;
-                    }
-
-                    var data;
-
-                    if (nread < CHUNK_SIZE) {
-                        data = buffer.slice(0, nread);
-
-                    } else {
-                        data = buffer;
-
-                    }
-                    //let json = JSON.stringify(data);                        
-                    oneClient.send(data.toString('utf8'));
-                });
-            }
-            readNextChunk();
+        readerStream.on('data', function (chunk) {
+            oneClient.send(chunk);
         });
 
+        readerStream.on('end', function (err) {
+            console.log("Successful");
+        });
+        readerStream.on('error', function (err) {
+            //err.stack
+            oneClient.send("Error occured");
+        });
     });
 
     //readMe();
