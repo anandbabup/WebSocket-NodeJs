@@ -10,12 +10,13 @@ window.onload = () => {
     // when a message is received from the socket connection,
     // the message will contain the id of a button that the other player clicked
     socketConnection.onmessage = (messageObject) => {
+      console.log(messageObject.data);
       // if the button is unclicked, changes its text to "O", and disable the button
-      const buttonClicked = document.getElementById(messageObject.data);
-      if (buttonClicked.innerHTML === '-') {
-        buttonClicked.innerHTML = 'O';
-        buttonClicked.disabled = true;
-      }
+      // const buttonClicked = document.getElementById(messageObject.data);
+      // if (buttonClicked.innerHTML === '-') {
+      //   buttonClicked.innerHTML = 'O';
+      //   buttonClicked.disabled = true;
+      // }
     };
     
     // an event listener to log any errors with the socket connection.

@@ -10,7 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "csv-parse": "^4.11.1",
     "express": "^4.17.1",
+    "get-stream": "^5.1.0",
+    "read-chunk": "^3.2.0",
     "ws": "^7.3.1"
   }
 }
